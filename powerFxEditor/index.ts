@@ -5,7 +5,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { ControlContainer, ControlContainerProps } from './ControlContainer';
 
-export class PowerFxEditor implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class powerFxEditor implements ComponentFramework.StandardControl<IInputs, IOutputs> {
   private _container: HTMLDivElement | null = null;
   private _rootReactContainer: ControlContainer | null = null;
   private _notifyOutputChanged: () => void;

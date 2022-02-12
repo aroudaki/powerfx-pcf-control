@@ -3,6 +3,7 @@ import * as React from 'react';
 import { IDisposable, MessageProcessor, PowerFxFormulaEditor } from '@microsoft/power-fx-formulabar/lib';
 import { sendDataAsync } from './Helper';
 import { PowerFxLanguageClient } from './PowerFxLanguageClient';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 interface PowerFxEditorState {
   context: string;
@@ -30,6 +31,7 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, PowerFxEd
   private _languageClient: PowerFxLanguageClient;
   private _messageProcessor: MessageProcessor;
   private _listener: (data: string) => void = () => null;
+  private _editor: monaco.editor.ICodeEditor | undefined;
 
   constructor(props: PowerFxEditorProps) {
     super(props);
@@ -69,7 +71,9 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, PowerFxEd
           messageProcessor={this._messageProcessor}
           maxLineCount={editorMaxLine || 1}
           minLineCount={editorMinLine || 1}
+          monacoEditorOptions={{ fixedOverflowWidgets: false }}
           onChange={this._onExpressionChanged}
+          onEditorDidMount={(editor, _): void => { this._editor = editor }}
           lspConfig={{
             enableSignatureHelpRequest: true
           }}

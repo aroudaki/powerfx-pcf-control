@@ -9,6 +9,8 @@ const platformLibrariesHandler_1 = require("./platformLibrariesHandler");
 const _ = require("lodash");
 const path = require('path');
 const fs = require('fs');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
 // Append a stub to webpack bundle to prevent overwriting global variables
 // If different controls are using the same namespace, webpack will keep redeclaring
 // the namespace as global variables. As a result, only of one the controls can be called.
@@ -42,6 +44,9 @@ function getWebpackConfig(control, controlOutputDir, buildMode, watchFlag) {
         customConfig = require(customConfigPath);
     }
     const allowProjectReferences = featureMgr.isFeatureEnabled('pcfAllowProjectReferences');
+    // Try the environment variable, otherwise use root
+    const ASSET_PATH = process.env.ASSET_PATH || '/';
+
     const oobConfig = {
         // `production` mode will minify, while `development` will optimize for debugging.
         mode: buildMode,
@@ -56,7 +61,8 @@ function getWebpackConfig(control, controlOutputDir, buildMode, watchFlag) {
             library: constants.TEMP_NAMESPACE,
             pathinfo: true,
             filename: constants.BUNDLE_NAME,
-            path: controlOutputDir
+            path: controlOutputDir,
+            publicPath: ASSET_PATH
         },
         resolve: {
             // Tell webpack which extensions to try when it is looking for a file.
@@ -85,13 +91,12 @@ function getWebpackConfig(control, controlOutputDir, buildMode, watchFlag) {
                 },
                 {
                     test: /\.css$/,
-                    use: ["style-loader", "css-loader"],
+                    use: ['style-loader', 'css-loader']
                 },
                 {
-                    test: /\.(eot|woff|woff2|svg|ttf)([\?]?.*)$/,
+                    test: /\.ttf$/,
                     use: ['file-loader']
-                },
-                { test: /\.(png|woff|woff2|eot|ttf|svg)$/, use: ['url-loader?limit=100000'] }
+                }
             ]
         },
         plugins: [
@@ -99,7 +104,8 @@ function getWebpackConfig(control, controlOutputDir, buildMode, watchFlag) {
                 // prevent creating split bundles, since the PCF runtime cannot handle chunked bundles
                 // neither does the control manifest and our tooling have support to build and package chunked bundles (e.g. no SoPa support)
                 maxChunks: 1
-            })
+            }),
+            new MonacoWebpackPlugin({ languages: [] })
         ]
     };
     const mergedConfig = Object.assign(Object.assign({}, oobConfig), customConfig);

@@ -10,8 +10,9 @@
     "refreshTypes": "pcf-scripts refreshTypes"
   },
   "dependencies": {
-    "@fluentui/react": "^8.55.1",
+    "@fluentui/react": "8.41.4",
     "@microsoft/power-fx-formulabar": "^2.0.4",
+    "monaco-editor": "0.27.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
   },
@@ -29,6 +30,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "file-loader": "^6.2.0",
+    "mini-css-extract-plugin": "^2.5.3",
+    "monaco-editor-webpack-plugin": "4.0.0",
     "pcf-scripts": "^1",
     "pcf-start": "^1",
     "style-loader": "^2.0.0",
