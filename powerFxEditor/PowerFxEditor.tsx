@@ -58,30 +58,26 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorSta
     const { formula, evaluateValue } = this.state;
     const { editorMaxLine, editorMinLine } = this.props;
 
-    if (formula) {
-      if (!evaluateValue) {
-        this._evalAsync(formula);
-      }
-
-      return (
-        <div>
-          <PowerFxFormulaEditor
-            getDocumentUriAsync={this._getDocumentUriAsync}
-            defaultValue={formula}
-            messageProcessor={this._messageProcessor}
-            maxLineCount={editorMaxLine || 1}
-            minLineCount={editorMinLine || 1}
-            monacoEditorOptions={{ fixedOverflowWidgets: false }}
-            onChange={this._onExpressionChanged}
-            lspConfig={{
-              enableSignatureHelpRequest: true
-            }}
-          />
-          <div style={{ minHeight: 21, border: '#d2d0ce 1px solid' }}>{evaluateValue}</div>
-        </div>);
-    } else {
-      return <></>
+    if (formula && !evaluateValue) {
+      this._evalAsync(formula);
     }
+
+    return (
+      <div>
+        <PowerFxFormulaEditor
+          getDocumentUriAsync={this._getDocumentUriAsync}
+          defaultValue={formula ?? ''}
+          messageProcessor={this._messageProcessor}
+          maxLineCount={editorMaxLine || 1}
+          minLineCount={editorMinLine || 1}
+          monacoEditorOptions={{ fixedOverflowWidgets: false }}
+          onChange={this._onExpressionChanged}
+          lspConfig={{
+            enableSignatureHelpRequest: true
+          }}
+        />
+        <div style={{ minHeight: 21, border: '#d2d0ce 1px solid' }}>{evaluateValue}</div>
+      </div>);
   }
 
   private _onExpressionChanged = (newValue: string): void => {
