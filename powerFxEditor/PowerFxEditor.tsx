@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import { IDisposable, MessageProcessor, PowerFxFormulaEditor } from '@microsoft/power-fx-formulabar/lib';
-import { sendDataAsync } from './Helper';
+import { sendDataAsync } from './lsp_helper';
 import { PowerFxLanguageClient } from './PowerFxLanguageClient';
 
 export interface EditorState {

@@ -1,5 +1,5 @@
 
-import { sendDataAsync } from './Helper';
+import { sendDataAsync } from './lsp_helper';
 
 export class PowerFxLanguageClient {
   public constructor(private _lsp_url: string, private _onDataReceived: (data: string) => void) {
