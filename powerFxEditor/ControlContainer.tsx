@@ -26,7 +26,7 @@ export class ControlContainer extends React.Component<ControlContainerProps, Con
     const { context } = this.state;
     const defaultContext = JSON.stringify({ "A": "ABC", "B": { "Inner": 123 } });
     let lspServiceURL = context?.parameters.lspServiceURL.raw;
-    lspServiceURL = lspServiceURL && lspServiceURL.length > 0 ? lspServiceURL : 'https://powerfxdemo.azurewebsites.net/'
+    lspServiceURL = lspServiceURL && lspServiceURL.length > 0 ? lspServiceURL : 'https://localhost:5001/';
     let formulaContext = context?.parameters.formulaContext.raw;
     formulaContext = formulaContext && formulaContext.length > 0 ? formulaContext : defaultContext;
 
