@@ -34,7 +34,7 @@ export class ControlContainer extends React.Component<ControlContainerProps, Con
       <div className="pa-fx-editor-container">
         <PowerFxEditor
           lsp_url={lspServiceURL}
-          expression={context?.parameters.formula.raw || ''}
+          formula={context?.parameters.formula.raw || undefined}
           formulaContext={formulaContext}
           editorMaxLine={context?.parameters.editorMaxLine.raw || 3}
           editorMinLine={context?.parameters.editorMinLine.raw || 3}

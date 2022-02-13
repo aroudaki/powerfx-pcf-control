@@ -3,12 +3,6 @@ import * as React from 'react';
 import { IDisposable, MessageProcessor, PowerFxFormulaEditor } from '@microsoft/power-fx-formulabar/lib';
 import { sendDataAsync } from './Helper';
 import { PowerFxLanguageClient } from './PowerFxLanguageClient';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-
-interface PowerFxEditorState {
-  context: string;
-  expression: string;
-}
 
 export interface EditorState {
   formula?: string;
@@ -16,25 +10,24 @@ export interface EditorState {
   evaluateValue?: string
 }
 
-
 export interface PowerFxEditorProps {
   lsp_url: string
-  expression?: string;
+  formula?: string;
   formulaContext?: string;
   editorMaxLine?: number;
   editorMinLine?: number;
   onEditorStateChanged?: (newState: EditorState) => void;
-
 }
 
-export class PowerFxEditor extends React.Component<PowerFxEditorProps, PowerFxEditorState> {
+export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorState> {
   private _languageClient: PowerFxLanguageClient;
   private _messageProcessor: MessageProcessor;
   private _listener: (data: string) => void = () => null;
-  private _editor: monaco.editor.ICodeEditor | undefined;
 
   constructor(props: PowerFxEditorProps) {
     super(props);
+
+    this.state = {};
 
     const onDataReceived = (data: string) => {
       this._listener(data);
@@ -51,64 +44,75 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, PowerFxEd
       sendAsync: async (data: string): Promise<void> =>
         this._languageClient.sendAsync(data)
     };
+  }
 
-    this.state = {
-      context: this.props.formulaContext || '',
-      expression: this.props.expression || ''
-    };
+  public static getDerivedStateFromProps(props: PowerFxEditorProps, state: EditorState): EditorState {
+    return {
+      formula: state.formula ?? props.formula,
+      evaluateValue: state.evaluateValue ?? '',
+      error: state.error ?? ''
+    }
   }
 
   public render() {
-    const { expression } = this.state;
+    const { formula, evaluateValue } = this.state;
     const { editorMaxLine, editorMinLine } = this.props;
 
+    if (formula) {
+      if (!evaluateValue) {
+        this._evalAsync(formula);
+      }
 
-    return (
-      <div>
-        <PowerFxFormulaEditor
-          getDocumentUriAsync={this._getDocumentUriAsync}
-          defaultValue={expression || ''}
-          messageProcessor={this._messageProcessor}
-          maxLineCount={editorMaxLine || 1}
-          minLineCount={editorMinLine || 1}
-          monacoEditorOptions={{ fixedOverflowWidgets: false }}
-          onChange={this._onExpressionChanged}
-          onEditorDidMount={(editor, _): void => { this._editor = editor }}
-          lspConfig={{
-            enableSignatureHelpRequest: true
-          }}
-        />
-      </div>
-    );
+      return (
+        <div>
+          <PowerFxFormulaEditor
+            getDocumentUriAsync={this._getDocumentUriAsync}
+            defaultValue={formula}
+            messageProcessor={this._messageProcessor}
+            maxLineCount={editorMaxLine || 1}
+            minLineCount={editorMinLine || 1}
+            monacoEditorOptions={{ fixedOverflowWidgets: false }}
+            onChange={this._onExpressionChanged}
+            lspConfig={{
+              enableSignatureHelpRequest: true
+            }}
+          />
+          <div style={{ minHeight: 21, border: '#d2d0ce 1px solid' }}>{evaluateValue}</div>
+        </div>);
+    } else {
+      return <></>
+    }
   }
 
   private _onExpressionChanged = (newValue: string): void => {
-    const { context } = this.state;
     const { onEditorStateChanged } = this.props;
 
-    this.setState({ expression: newValue });
-    onEditorStateChanged?.({ formula: newValue });
-    this._evalAsync(context, newValue);
+    this.setState({ formula: newValue }, () => {
+      onEditorStateChanged?.(this.state);
+    });
+
+    this._evalAsync(newValue);
   }
 
-  private _evalAsync = async (context: string, expression: string): Promise<void> => {
-    const { lsp_url, onEditorStateChanged } = this.props;
-    const result = await sendDataAsync(lsp_url, 'eval', JSON.stringify({ context, expression }));
+  private _evalAsync = async (expression: string): Promise<void> => {
+    const { lsp_url, onEditorStateChanged, formulaContext } = this.props;
+    const result = await sendDataAsync(lsp_url, 'eval', JSON.stringify({ context: formulaContext, expression }));
     if (!result.ok) {
       return;
     }
 
     const response = await result.json();
+    let newState: EditorState = { formula: this.state.formula, evaluateValue: '', error: '' };
     if (response.result) {
-      onEditorStateChanged?.({ evaluateValue: response.result, error: '' });
+      newState.evaluateValue = response.result;
     } else if (response.error) {
-      onEditorStateChanged?.({ evaluateValue: '', error: response.error });
-    } else {
-      onEditorStateChanged?.({ evaluateValue: '', error: '' });
+      newState.error = response.error;
     }
+    onEditorStateChanged?.(newState);
+    this.setState(newState);
   };
 
   private _getDocumentUriAsync = async (): Promise<string> => {
-    return `powerfx://demo?context=${this.state.context}`;
+    return `powerfx://demo?context=${this.props.formulaContext}`;
   };
 }
