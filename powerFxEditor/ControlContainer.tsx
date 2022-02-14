@@ -30,8 +30,14 @@ export class ControlContainer extends React.Component<ControlContainerProps, Con
     let formulaContext = context?.parameters.formulaContext.raw;
     formulaContext = formulaContext && formulaContext.length > 0 ? formulaContext : defaultContext;
 
+    const containerStyle: React.CSSProperties = {
+      width: context?.mode.allocatedWidth ?? 0 > 0 ? context?.mode.allocatedWidth : "400px",
+      height: context?.mode.allocatedHeight ?? 0 > 0 ? context?.mode.allocatedHeight : "200px",
+      position: "relative"
+    }
+
     return (
-      <div className="pa-fx-editor-container">
+      <div style={containerStyle}>
         <PowerFxEditor
           lsp_url={lspServiceURL}
           formula={context?.parameters.formula.raw || undefined}
