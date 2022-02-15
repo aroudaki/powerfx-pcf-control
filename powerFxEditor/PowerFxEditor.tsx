@@ -62,14 +62,10 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorSta
       this._evalAsync(formula);
     }
 
-    const containerStyle: React.CSSProperties = {
-      width: "100%",
-      height: "100%",
-      position: "absolute",
-    }
+
 
     return (
-      <div style={containerStyle}>
+      <>
         <PowerFxFormulaEditor
           getDocumentUriAsync={this._getDocumentUriAsync}
           defaultValue={formula ?? ''}
@@ -83,7 +79,8 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorSta
           }}
         />
         <div style={{ minHeight: 21, border: '#d2d0ce 1px solid' }}>{evaluateValue}</div>
-      </div>);
+      </>
+    );
   }
 
   private _onExpressionChanged = (newValue: string): void => {
