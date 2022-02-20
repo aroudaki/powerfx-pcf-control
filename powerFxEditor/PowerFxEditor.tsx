@@ -48,9 +48,11 @@ export class PowerFxEditor extends React.PureComponent<PowerFxEditorProps, Edito
       sendAsync: async (data: string): Promise<void> =>
         this._languageClient.sendAsync(data)
     };
+  }
 
+  public async componentDidMount() {
     if (this.props.formula && this.props.formula.length > 0) {
-      this._evalAsync(this.props.formula);
+      setTimeout(() => this._evalAsync(this.props.formula), 50);
     }
   }
 
