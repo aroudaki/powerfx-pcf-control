@@ -1,7 +1,13 @@
 {
   "name": "pcf-project",
-  "version": "1.0.0",
-  "description": "Project containing your PowerApps Component Framework (PCF) control.",
+  "version": "0.0.1",
+  "description": "Project containing PowerFx PCF Control.",
+  "license": "MIT",
+  "author": "Ali Roudaki",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aroudaki/powerfx-pcf-control.git"
+  },
   "scripts": {
     "build": "pcf-scripts build",
     "clean": "pcf-scripts clean",
