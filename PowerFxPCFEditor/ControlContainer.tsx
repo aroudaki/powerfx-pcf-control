@@ -4,12 +4,11 @@ import { IInputs } from "./generated/ManifestTypes";
 import { EditorState, PowerFxEditor } from "./PowerFxEditor";
 
 export interface ControlContainerProps extends React.ClassAttributes<ControlContainer> {
-  initialState?: ComponentFramework.Dictionary | null;
   onEditorStateChanged?: (newState: EditorState) => void;
+  context: ComponentFramework.Context<IInputs> | null;
 }
 
 interface ControlContainerState {
-  context: ComponentFramework.Context<IInputs> | null;
   recId: string | null;
   entityName: string | null;
   entityRecordJString?: string;
@@ -22,23 +21,30 @@ export class ControlContainer extends React.Component<ControlContainerProps, Con
     const pageURL = this.parsePageURL();
 
     this.state = {
-      context: null,
       recId: pageURL.id || null,
       entityName: pageURL.etn || null
     };
   }
 
-  public async updateContext(context: ComponentFramework.Context<IInputs>) {
-    if (this.state.entityRecordJString) {
-      this.setState({ context });
-    } else {
-      const entityRecordJString = await this.generateRecordContext();
-      this.setState({ context, entityRecordJString });
+  public static deriveStateFromProps(props: ControlContainerProps): ControlContainerState {
+    return {
+      recId: (props.context as any)?.page.entityId || null,
+      entityName: (props.context as any)?.page.entityTypeName || null
+    }
+  }
+
+  public componentDidUpdate(prevProps: Readonly<ControlContainerProps>, prevState: Readonly<ControlContainerState>, snapshot?: any): void {
+    if (!this.state.entityRecordJString) {
+      this.generateRecordContext().then(entityRecordJString => {
+        if (entityRecordJString !== this.state.entityRecordJString) {
+          this.setState({ entityRecordJString });
+        }
+      })
     }
   }
 
   public render() {
-    const { context } = this.state;
+    const { context } = this.props;
     let lspServiceURL = context?.parameters.lspServiceURL.raw;
 
     let formulaContext: string | undefined;
@@ -72,7 +78,8 @@ export class ControlContainer extends React.Component<ControlContainerProps, Con
   }
 
   private async generateRecordContext() {
-    const { context, recId, entityName } = this.state;
+    const { recId, entityName } = this.state;
+    const { context } = this.props;
     if (context && recId && entityName) {
       const rawEntityRecord = await context.webAPI.retrieveRecord(entityName, recId);
       const entityRecord: ComponentFramework.WebApi.Entity = {};
@@ -97,8 +104,9 @@ export class ControlContainer extends React.Component<ControlContainerProps, Con
           parsedURLObj[paramPair[0]] = paramPair[1];
         }
       }
-    } catch { }
-
+    } catch {
+      console.log("Error parsing URL");
+    }
 
     return parsedURLObj;
   }

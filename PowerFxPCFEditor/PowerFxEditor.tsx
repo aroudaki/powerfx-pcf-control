@@ -61,7 +61,7 @@ export class PowerFxEditor extends React.PureComponent<PowerFxEditorProps, Edito
     const { editorMaxLine, editorMinLine } = this.props;
 
     return (
-      <div>
+      <>
         <PowerFxFormulaEditor
           getDocumentUriAsync={this._getDocumentUriAsync}
           defaultValue={formula}
@@ -75,7 +75,7 @@ export class PowerFxEditor extends React.PureComponent<PowerFxEditorProps, Edito
           }}
         />
         <div style={{ minHeight: 21, border: '#d2d0ce 1px solid' }}>{evaluateValue ?? ''}</div>
-      </div>);
+      </>);
   }
 
   private _onExpressionChanged = (newValue: string): void => {
