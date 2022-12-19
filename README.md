@@ -14,5 +14,7 @@ Run `msbuild /t:build restore` in the `powerFxControlSln` folder
 
 ## PowerFX
 
+To learn more about PowerFX, please visit the following links:
+
 - See [PowerFX](https://github.com/microsoft/Power-Fx) for more information on PowerFX.
 - See [PowerFX Samples](https://github.com/microsoft/power-fx-host-samples) for samples
