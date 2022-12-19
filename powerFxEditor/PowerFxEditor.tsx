@@ -5,21 +5,22 @@ import { sendDataAsync } from './lsp_helper';
 import { PowerFxLanguageClient } from './PowerFxLanguageClient';
 
 export interface EditorState {
-  formula?: string;
+  formula: string;
+  formulaContext: string;
   error?: string;
   evaluateValue?: string
 }
 
 export interface PowerFxEditorProps {
   lsp_url: string
-  formula?: string;
-  formulaContext?: string;
+  formula: string;
+  formulaContext: string;
   editorMaxLine?: number;
   editorMinLine?: number;
   onEditorStateChanged?: (newState: EditorState) => void;
 }
 
-export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorState> {
+export class PowerFxEditor extends React.PureComponent<PowerFxEditorProps, EditorState> {
   private _languageClient: PowerFxLanguageClient;
   private _messageProcessor: MessageProcessor;
   private _listener: (data: string) => void = () => null;
@@ -27,7 +28,10 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorSta
   constructor(props: PowerFxEditorProps) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      formula: props.formula,
+      formulaContext: props.formulaContext
+    };
 
     const onDataReceived = (data: string) => {
       this._listener(data);
@@ -46,11 +50,9 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorSta
     };
   }
 
-  public static getDerivedStateFromProps(props: PowerFxEditorProps, state: EditorState): EditorState {
-    return {
-      formula: state.formula ?? props.formula,
-      evaluateValue: state.evaluateValue ?? '',
-      error: state.error ?? ''
+  public async componentDidMount() {
+    if (this.props.formula && this.props.formula.length > 0) {
+      setTimeout(() => this._evalAsync(this.props.formula), 50);
     }
   }
 
@@ -58,17 +60,11 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorSta
     const { formula, evaluateValue } = this.state;
     const { editorMaxLine, editorMinLine } = this.props;
 
-    if (formula && !evaluateValue) {
-      this._evalAsync(formula);
-    }
-
-
-
     return (
       <>
         <PowerFxFormulaEditor
           getDocumentUriAsync={this._getDocumentUriAsync}
-          defaultValue={formula ?? ''}
+          defaultValue={formula}
           messageProcessor={this._messageProcessor}
           maxLineCount={editorMaxLine || 1}
           minLineCount={editorMinLine || 1}
@@ -78,9 +74,8 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorSta
             enableSignatureHelpRequest: true
           }}
         />
-        <div style={{ minHeight: 21, border: '#d2d0ce 1px solid' }}>{evaluateValue}</div>
-      </>
-    );
+        <div style={{ minHeight: 21, border: '#d2d0ce 1px solid' }}>{evaluateValue ?? ''}</div>
+      </div>);
   }
 
   private _onExpressionChanged = (newValue: string): void => {
@@ -94,24 +89,24 @@ export class PowerFxEditor extends React.Component<PowerFxEditorProps, EditorSta
   }
 
   private _evalAsync = async (expression: string): Promise<void> => {
-    const { lsp_url, onEditorStateChanged, formulaContext } = this.props;
+    const { lsp_url, onEditorStateChanged } = this.props;
+    const { formulaContext, formula } = this.state;
     const result = await sendDataAsync(lsp_url, 'eval', JSON.stringify({ context: formulaContext, expression }));
     if (!result.ok) {
       return;
     }
 
     const response = await result.json();
-    let newState: EditorState = { formula: this.state.formula, evaluateValue: '', error: '' };
+    let newState: EditorState = { formula, formulaContext, evaluateValue: '', error: '' };
     if (response.result) {
       newState.evaluateValue = response.result;
     } else if (response.error) {
       newState.error = response.error;
     }
-    onEditorStateChanged?.(newState);
-    this.setState(newState);
+    this.setState(newState, () => { onEditorStateChanged?.(newState) });
   };
 
   private _getDocumentUriAsync = async (): Promise<string> => {
-    return `powerfx://demo?context=${this.props.formulaContext}`;
+    return `powerfx://demo?context=${this.state.formulaContext}`;
   };
 }
