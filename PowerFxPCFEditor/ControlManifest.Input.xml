@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="SampleNS" constructor="PowerFxPCFEditor" version="0.0.1" display-name-key="PowerFxPCFEditor" description-key="PowerFxPCFEditor description" control-type="virtual" >
+    <property name="formula" display-name-key="Formula" description-key="PowerFx Formula" of-type="SingleLine.Text" usage="bound" />
+    <property name="formulaContext" display-name-key="Formula Context" description-key="Formula context" of-type="SingleLine.Text" usage="input" />
+    <property name="lspServiceURL" display-name-key="LSPServiceURL" description-key="LSP Service URL" of-type="SingleLine.Text" usage="input" />
+    <property name="editorMaxLine" display-name-key="EditorMaxLine" description-key="Editor max line count" of-type="Whole.None" usage="input" />
+    <property name="editorMinLine" display-name-key="EditorMinLine" description-key="Editor min line count" of-type="Whole.None" usage="input" />
+    <property name="evaluateValue" display-name-key="EvaluatedValue" description-key="Outputs formula evaluated value" of-type="SingleLine.Text" usage="bound" />
+    <property name="error" display-name-key="Error" description-key="Outputs formula evaluation error" of-type="SingleLine.Text" usage="bound" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <platform-library name="React" version="16.8.6" />
+      <platform-library name="Fluent" version="8.29.0" />
+    </resources>
+    <feature-usage>
+      <uses-feature name="Utility" required="true" />
+      <uses-feature name="WebAPI" required="true" />
+    </feature-usage>
+  </control>
+</manifest>
