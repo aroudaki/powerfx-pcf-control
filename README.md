@@ -14,5 +14,8 @@ Run `msbuild /t:build restore` in the `powerFxControlSln` folder
 
 ## PowerFX
 
+To work with this control you need to have a LSP server and provide the endpoint url to the control.
+To learn more about PowerFX and how to get started with it, please visit the following links:
+
 - See [PowerFX](https://github.com/microsoft/Power-Fx) for more information on PowerFX.
 - See [PowerFX Samples](https://github.com/microsoft/power-fx-host-samples) for samples
