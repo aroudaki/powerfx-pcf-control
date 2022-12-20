@@ -64,7 +64,7 @@ export class ControlContainer extends React.Component<ControlContainerProps, Con
     }
 
     return (
-      <div className="pa-fx-editor-container">
+      <div className="sample-fx-editor-container">
         <PowerFxEditor
           lsp_url={lspServiceURL}
           formula={context?.parameters.formula.raw || ''}

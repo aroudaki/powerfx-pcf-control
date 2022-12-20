@@ -25,6 +25,7 @@ export class PowerFxPCFEditor implements ComponentFramework.ReactControl<IInputs
     ): void {
         context.mode.trackContainerResize(true);
         this._notifyOutputChanged = notifyOutputChanged;
+        this.injectCSSOverride(context);
     }
 
     /**
@@ -54,5 +55,18 @@ export class PowerFxPCFEditor implements ComponentFramework.ReactControl<IInputs
      */
     public destroy(): void {
         // Add code to cleanup control if necessary
+    }
+
+    private injectCSSOverride(context: ComponentFramework.Context<IInputs>) {
+        // Override the the control container style to allow overflow
+        // this is needed to allow powerFx intellisense drop down to show up full size
+        try {
+            const controlId = (context.factory as any)._customControlProperties.controlId.split('.')[0];
+            const cssOverride = document.createElement("style");
+            cssOverride.innerHTML = `div[data-control-name="${controlId}"], div[data-control-name="${controlId}"] * {overflow: visible;}`;
+            document.body.appendChild(cssOverride);
+        } catch (error) {
+            console.log(error);
+        }
     }
 }

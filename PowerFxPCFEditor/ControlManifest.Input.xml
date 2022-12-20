@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="SampleNS" constructor="PowerFxPCFEditor" version="0.0.1" display-name-key="PowerFxPCFEditor" description-key="PowerFxPCFEditor description" control-type="virtual" >
+  <control namespace="SampleNS" constructor="PowerFxPCFEditor" version="0.0.2" display-name-key="PowerFxPCFEditor" description-key="PowerFxPCFEditor description" control-type="virtual" >
     <property name="formula" display-name-key="Formula" description-key="PowerFx Formula" of-type="SingleLine.Text" usage="bound" />
     <property name="formulaContext" display-name-key="Formula Context" description-key="Formula context" of-type="SingleLine.Text" usage="input" />
     <property name="lspServiceURL" display-name-key="LSPServiceURL" description-key="LSP Service URL" of-type="SingleLine.Text" usage="input" />
@@ -10,6 +10,7 @@
     <property name="error" display-name-key="Error" description-key="Outputs formula evaluation error" of-type="SingleLine.Text" usage="bound" />
     <resources>
       <code path="index.ts" order="1"/>
+      <css path="controlStyles.css" order="1"/>
       <platform-library name="React" version="16.8.6" />
       <platform-library name="Fluent" version="8.29.0" />
     </resources>
